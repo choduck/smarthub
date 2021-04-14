@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;ChatClient.java&apos; to &apos;smarthub.server/src/main/java/(default package)&apos;&#x0D;&#x0A;- Original project: &apos;chat-javafx-client&apos;&#x0D;&#x0A;- Destination element: &apos;smarthub.server/src/main/java/(default package)&apos;&#x0D;&#x0A;- Original element: &apos;com.example.grpc.chat.ChatClient.java&apos;" description="Copy compilation unit" destination="=smarthub.server/src\/main\/java&lt;" element1="/src\/main\/java&lt;com.example.grpc.chat{ChatClient.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1557990811608" units="1" version="1.0"/>
+</session>

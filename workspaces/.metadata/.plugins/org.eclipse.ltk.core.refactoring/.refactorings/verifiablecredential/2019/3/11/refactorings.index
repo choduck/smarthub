@@ -1,0 +1,29 @@
+1552356430003	Rename type 'CenterController'
+1552356754881	Rename type 'CenterService'
+1552356793273	Rename type 'Center'
+1552356820175	Rename type 'CenterDao'
+1552357351331	Rename type 'CertiFieldrDao'
+1552357382941	Rename resource 'center.xml'
+1552357626721	Move folder
+1552363629350	Rename resource 'log4jdbc-log4j2.properties'
+1552363857763	Delete elements
+1552363917985	Delete element
+1552364209997	Delete element
+1552364422845	Delete element
+1552364427276	Delete element
+1552697874628	Delete elements
+1552766750006	Rename resource 'lef_menu.jsp'
+1552767226900	Delete element
+1552767514012	Rename resource 'common'
+1552767531581	Move files
+1552767536077	Delete element
+1552767542458	Move folders
+1552767586860	Delete element
+1552768303701	Rename type 'CertiFieldController'
+1552768329988	Rename type 'CertiFieldService'
+1552768503584	Rename type 'CertiField'
+1552768863240	Delete element
+1552768877771	Delete element
+1552768945114	Rename type 'MemberSearch'
+1552769244416	Rename type 'CertiFieldDao'
+1552769279291	Rename resource 'CertiField.xml'

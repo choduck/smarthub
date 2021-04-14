@@ -1,0 +1,313 @@
+package com.wooribank.blockchain.verifiablecredential;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.protobuf.ByteString;
+
+import io.grpc.stub.StreamObserver;
+
+public class VerifiableCredentialServerImpl extends VerifiableCredentialGrpc.VerifiableCredentialImplBase {
+	
+	String db_driver = "org.mariadb.jdbc.Driver";
+	String db_host = "52.79.127.56";  // REAL
+    //String db_host = "10.182.78.51";  // DEV
+	String db_user = "blockchain";
+    String db_pass = "blockchain!@";
+    String db_name = "BLOCKCHAIN";
+    String db_url = "jdbc:mariadb://" + db_host + "/" + db_name;
+    
+    int ERROR   = 1;
+    int SUCCESS = 0;
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void process(ProcessRequest request, StreamObserver<ProcessResponse> responseObserver) {
+	    
+    	
+	    int reqType = request.getRequestType();
+	    String args = request.getArgs();
+	
+	    System.out.println("# args : " + args);
+	    JSONParser parser = new JSONParser();
+	    JSONObject argObect = null;
+        
+	    if (reqType == 2) {	// 자격 목록 요청
+	    	Connection conn= null;
+            PreparedStatement stmt = null;
+            StringBuffer sb = null;
+            		
+            try {
+            	Class.forName(db_driver);
+            	conn = DriverManager.getConnection(db_url, db_user, db_pass);
+                 
+            	sb = new StringBuffer();
+                sb.append(" SELECT	A.certiCd AS id,                             				\n");
+                sb.append("         CASE WHEN A.certiCd = '10001' THEN 'MobileID'   \n");
+                sb.append("         ELSE 'MobileLicense'                             			\n");
+                sb.append("         END AS type,                                     			\n");
+                sb.append("         (SELECT cdNm                                     			\n");
+                sb.append("             FROM code                                    			\n");
+                sb.append("             WHERE uppCd = 'B0001'                        		\n");
+                sb.append("                 AND cd = A.certiCd                       			\n");
+                sb.append("         ) AS description                                 			\n");
+                sb.append(" FROM certi_list AS  A                                    			\n");
+                    
+                stmt = conn.prepareStatement(sb.toString());
+                 
+                ResultSet rs = stmt.executeQuery();
+                 
+                JSONObject ret = new JSONObject();
+                JSONArray credentialTypeList = new JSONArray();
+                 
+                while (rs.next()){
+                	JSONObject jsonObj = new JSONObject();
+                        
+                     jsonObj.put("id", 				rs.getString("id"));
+                     jsonObj.put("type", 			rs.getString("type"));
+                     jsonObj.put("description", 	rs.getString("description"));
+                        
+                     credentialTypeList.add(jsonObj);
+                }
+                 
+                ret.put("credential_type_list", credentialTypeList);
+                 
+                System.out.println("### credential_type_list : " + ret.toJSONString());
+                 
+                stmt.close(); 
+                conn.close();
+                 
+                SUCCEED( responseObserver, ByteString.copyFromUtf8(ret.toJSONString()) );
+            } catch (ClassNotFoundException ce) {
+            	ERROR( responseObserver, ByteString.copyFromUtf8("DB Driver Load fail") );   
+            } catch (SQLException e) {
+                clearConnection(conn, stmt);
+                ERROR( responseObserver, ByteString.copyFromUtf8("DB processing error") );
+            }
+	    }  // End of if (reqType == 2) {	// 자격 목록 요청 종료
+	    else if (reqType == 4) {	// 자격 필드 요청
+	    	
+	    	try {
+	             argObect = (JSONObject) parser.parse(args);
+	    	} catch (ParseException e) {
+	         	ERROR( responseObserver, ByteString.copyFromUtf8("json parsing error") );
+	             return;
+	    	}
+	    	 
+	    	if (((JSONArray)argObect.get("args")).size() <= 0) {
+	    		ERROR( responseObserver, ByteString.copyFromUtf8("request with no data") );
+	            return;
+	        }
+	    	
+	    	Connection conn= null;
+            PreparedStatement stmt = null;
+            StringBuffer sb = new StringBuffer();
+            
+            try {
+            	Class.forName(db_driver);
+            	conn = DriverManager.getConnection(db_url, db_user, db_pass);
+                
+                sb.append(" SELECT	orderNo,					\n");
+                sb.append("         fieldNm AS name,        \n");
+                sb.append("         fieldKorNm AS title,        \n");
+                sb.append("         dataTp AS type,         \n");
+                sb.append("         desctn AS description	\n");
+                sb.append(" FROM certi_field AS  A         \n");
+                sb.append(" WHERE certiCd = ?              \n");
+                
+                JSONArray argsArray = (JSONArray) argObect.get("args");
+                
+                JSONObject ret = new JSONObject();
+                JSONArray credentialFieldList = new JSONArray();
+                
+                for (int i=0; i<argsArray.size(); i++) {
+	                stmt = conn.prepareStatement(sb.toString());
+	                stmt.setString(1, argsArray.get(i).toString().replace("[\"", "").replace("\"]",""));
+	                
+	                ResultSet rs = stmt.executeQuery();
+	                
+	                while (rs.next()) {
+	                	JSONObject jsonObj = new JSONObject();
+	                       
+	                	jsonObj.put("orderNo", 	rs.getString("orderNo"));
+	                	jsonObj.put("name", 		rs.getString("name"));
+	                	jsonObj.put("title", 		rs.getString("title"));
+	                	jsonObj.put("type", 			rs.getString("type"));
+	                    JSONObject obj = (JSONObject)new JSONParser().parse(rs.getString("description"));
+	                    jsonObj.put("description", 	obj);
+	                	credentialFieldList.add(jsonObj);
+	                }
+    			}
+               
+                ret.put("credential_field_list", credentialFieldList);
+                
+                System.out.println("### credential_field_list : " + ret.toJSONString());
+                
+    			stmt.close();
+                conn.close();
+                
+                SUCCEED( responseObserver, ByteString.copyFromUtf8(ret.toJSONString()) );
+            } catch (ClassNotFoundException ce) {
+            	ERROR( responseObserver, ByteString.copyFromUtf8("DB Driver Load fail") );       
+            } catch (SQLException e) {
+                clearConnection(conn, stmt);
+                ERROR( responseObserver, ByteString.copyFromUtf8("DB processing error") );
+            } catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }  // End of if (reqType == 4) {	// 자격 필드 요청 종료
+	    else if (reqType == 6) {	// 신분 생성
+	    	
+	    	try {
+	             argObect = (JSONObject) parser.parse(args.replace("[", "").replace("]",""));
+	    	} catch (ParseException e){
+	         	ERROR( responseObserver, ByteString.copyFromUtf8("json parsing error") );
+	             return;
+	        }
+	    	 
+	    	System.out.println(argObect.get("args"));
+	    	
+	    	if (argObect.get("args").equals("")) {
+	    		ERROR( responseObserver, ByteString.copyFromUtf8("request with no data") );
+	            return;
+	        }
+	        
+	    	Connection conn= null;
+            PreparedStatement stmt = null;
+            StringBuffer sb = new StringBuffer();
+            
+            try {
+            	Class.forName(db_driver);
+            	conn = DriverManager.getConnection(db_url, db_user, db_pass);
+            	
+            	sb.append(" SELECT 											\n");
+    			sb.append(" EXISTS (SELECT *			    			\n");
+    			sb.append("            	   FROM member_certi_field   	\n");
+    			sb.append("            	 WHERE fieldNm = ?				\n");
+    			sb.append("            	     AND fieldCnt = ?				\n");
+    			sb.append("            ) AS existsFlg 						\n");
+                
+	            System.out.println( (JSONObject)(((JSONArray)argObect.get("args")).get(0)) );
+
+	            
+    			JSONObject dataObect = (JSONObject) argObect.get("args");
+    			Set<Entry<String, JsonElement>> keys = dataObect.keySet();
+    			Iterator i = keys.iterator();
+    			
+                List<String> listExists = new ArrayList<String>();
+                
+                while (i.hasNext()) {
+                	String key = i.next().toString();
+                	System.out.println("# key : " + key); 
+                	if ("picture".equals(key)) continue;
+                	
+                	String value = (String)argObect.get(key);
+                	System.out.println(sb.toString());
+                	System.out.println("key : " + key + " / value : " + value);
+                	stmt = conn.prepareStatement(sb.toString());
+	                stmt.setString(1, key);
+	                stmt.setString(2, value);
+	                
+	                ResultSet rs = stmt.executeQuery();
+	                
+	                if (rs.next()) {
+	                	listExists.add(rs.getString("existsFlg"));
+	                }
+                }
+                
+                String existsFlg = "";
+                for (int j=0; j<listExists.size(); j++) {
+                	if ( "0".equals(listExists.get(j)) ) {
+                		existsFlg = "N";
+                		break;
+                	}
+                }
+                
+                System.out.println("### existsFlg : " + existsFlg);
+                
+                if ( "N".equals(existsFlg) ) {
+                	ERROR( responseObserver, ByteString.copyFromUtf8(Status.ERROR.toString()) );
+                } else {
+                	SUCCEED( responseObserver, ByteString.copyFromUtf8(Status.SUCCESS.toString()) );
+                }
+               
+               stmt.close();
+               conn.close();
+            } catch (ClassNotFoundException ce) {
+            	ERROR( responseObserver, ByteString.copyFromUtf8("DB Driver Load fail") );      
+            } catch (SQLException e) {
+                clearConnection(conn, stmt);
+                ERROR( responseObserver, ByteString.copyFromUtf8("DB processing error") );
+            }
+            
+	    }  // End of if (reqType == 6) {	// 신분 생성 종료
+	    else if (reqType == 9) {	// 검증 후 자격 전달
+	    	try {
+	             argObect = (JSONObject) parser.parse(args);
+	    	} catch (ParseException e){
+	         	ERROR( responseObserver, ByteString.copyFromUtf8("json parsing error") );
+	             return;
+	        }
+	    	 
+	    	System.out.println("# argObect : " + argObect);
+	    	System.out.println("#  (JSONArray)argObect.get : " + (JSONArray)argObect.get("field_list"));
+	    }
+	}
+    
+    private void ERROR(StreamObserver<ProcessResponse> responseObserver, ByteString message){
+    	ProcessResponse.Builder builder = ProcessResponse.newBuilder();
+		builder.setPayload(message);  
+		ProcessResponse resp = builder.build();
+		  
+	    responseObserver.onNext(resp);
+	    responseObserver.onCompleted();
+    }
+    
+    private void SUCCEED(StreamObserver<ProcessResponse> responseObserver, ByteString message){
+        ProcessResponse.Builder builder = ProcessResponse.newBuilder();
+        builder.setPayload(message);
+		  
+		ProcessResponse resp = builder.build();
+		  
+	    responseObserver.onNext(resp);
+	    responseObserver.onCompleted();
+    }
+    
+    private void clearConnection(Connection conn, PreparedStatement stmt){
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+}

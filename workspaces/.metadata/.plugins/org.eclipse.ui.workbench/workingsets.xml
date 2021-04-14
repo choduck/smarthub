@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workingSetManager>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1552052002810_0" label="Java Main Sources" name="Java Main Sources">
+<item elementID="=verfiablecredential.server/src\/main\/java" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verfiablecredential.server/src\/main\/resources" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verfiablecredential.server/src\/test\/java" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verfiablecredential.server/src\/test\/resources" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verfiablecredential.server/build\/generated\/source\/proto\/main\/java" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verfiablecredential.server/build\/generated\/source\/proto\/main\/grpc" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verifiablecredential/src\/main\/java" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=verifiablecredential/src\/main\/resources" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSet>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1552052002839_1" label="Java Test Sources" name="Java Test Sources">
+<item elementID="=verifiablecredential/src\/test\/java" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+</workingSet>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1557982755329_3" label="chat-example" name="chat-example">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chat-server" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chat-vaadin-client" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chat-javafx-client" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chat-example" type="4"/>
+</workingSet>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1561880150825_4" label="nia-samples-parent" name="nia-samples-parent">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter9" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter1" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter5" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter7" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/echo-client" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter11" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter13" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/nia-samples-parent" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/utils" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter8" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter2" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter4" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter6" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/echo-server" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter10" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/chapter12" type="4"/>
+</workingSet>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1552053062102_2" label="Window Working Set" name="Aggregate for window 1552053062101"/>
+</workingSetManager>

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wooribank.blockchain.verifiablecredential.dao.MemberDao">
+	
+	<select id="listCount"  parameterType="Member" resultType="int">
+		SELECT COUNT(*) 
+		  FROM member		
+	</select>
+	
+	<select id="list" parameterType="Member"  resultType="Member">
+		SELECT seqNo
+                 , mbNm    
+                 , residNo   
+                 , CONCAT(substring(mobileNo, 1, 3), '-', substring(mobileNo, 4, 4), '-', substring(mobileNo, 7, 4)) AS mobileNo
+                 , DATE_FORMAT(joinDate, '%Y-%m-%d') AS joinDate
+                 , @rownum:=@rownum+1 AS rowNum
+		  FROM member
+		        , (SELECT @rownum:=0) TMP
+		 ORDER BY seqNo DESC 
+		  LIMIT #{beginArticleNum}, #{endArticleNum}
+	</select>
+
+	<insert id="insert" parameterType="Member">
+	
+		<selectKey keyProperty="seqNo" resultType="int" order="BEFORE"> 
+			SELECT IFNULL(MAX(seqNo),0)+1 AS next_id FROM member 
+	 	</selectKey> 
+	 	
+		INSERT 
+		   INTO member 
+		   (
+		   	seqNo
+			, mbNm
+         	, residNo
+   		 	, mobileNo
+   			, joinDate
+           ) VALUES (
+			  #{seqNo}
+			, #{mbNm}
+			, #{residNo}
+			, #{mobileNo}
+			, #{joinDate}
+		   )
+	</insert>	
+	
+	<select id="selectMember" parameterType="Member"  resultType="Member">
+		SELECT seqNo
+		         , mbNm    
+		         , residNo   
+		         , CONCAT(substring(mobileNo, 1, 3), '-', substring(mobileNo, 4, 4), '-', substring(mobileNo, 7, 4)) AS mobileNo
+		         , DATE_FORMAT(joinDate, '%Y-%m-%d') AS joinDate         		        
+		  FROM member  
+		WHERE seqNo = #{seqNo}
+	</select>
+	
+<!-- 	
+		<select id="selectMember" parameterType="Member"  resultType="Member">
+		SELECT seqNo
+		         , mbNm    
+		         , residNo   
+		         , CONCAT(substring(mobileNo, 1, 3), '-', substring(mobileNo, 4, 4), '-', substring(mobileNo, 7, 4)) AS mobileNo
+		         , DATE_FORMAT(joinDate, '%Y-%m-%d') AS joinDate         		        
+		  FROM member  
+		WHERE seqNo = #{seqNo}
+	</select>
+ -->	
+	
+	<select id="selectMemberCertiFieldGrpList" parameterType="Member"  resultType="MemberCertiField">
+		SELECT A.seqNo
+		         , A.issuedPlaceCd
+		         , (SELECT cdNm 
+			          FROM  code
+			         WHERE uppCd = 'A0001'
+			             AND cd = A.issuedPlaceCD
+			        ) AS issuedPlaceNm
+			     , A.certiCd
+			     , (SELECT cdNm 
+			           FROM code
+			         WHERE uppCd = 'B0001'
+			             AND cd = A.certiCd
+			        ) AS certiNm
+		   FROM member_certi_field AS A
+		  WHERE residNo = #{residNo}
+		  GROUP BY issuedPlaceCd
+		                , certiCd	
+	</select>
+	
+	<select id="selectMemberCertiFieldList" parameterType="Member"  resultType="MemberCertiField">
+		SELECT A.seqNo
+		         , A.residNo
+		         , A.issuedPlaceCd
+		         , A.certiCd		               
+		         , A.fieldNm
+		         , A.fieldKorNm
+		         , A.fieldCnt         
+		  FROM member_certi_field AS A    
+		WHERE residNo = #{residNo}		
+	</select>
+	
+	<select id="selectCertiFieldList" parameterType="CertiList"  resultType="CertiField">
+		SELECT L.issuedPlaceCd
+		         , L.certiCd
+			     , (SELECT cdNm 
+			           FROM code
+			         WHERE uppCd = 'B0001'
+			             AND cd = L.certiCd
+			       ) AS certiNm
+			      , F.seqNo
+		          , F.orderNo
+		          , F.fieldNm
+		          , F.fieldKorNm
+		          , F.dataTp
+		          , F.desctn
+		  FROM certi_list AS L
+		 INNER JOIN certi_field AS F
+		      ON L.certiCd = F.certiCd
+		WHERE L.issuedPlaceCd = #{issuedPlaceCd}
+		    AND L.certiCd = #{certiCd}
+		 ORDER BY F.orderNo ASC   
+	</select>
+	
+	<update id="update" parameterType="Member">
+		UPDATE member 
+		     SET mbNm = #{mbNm}
+		         , residNo = #{residNo}
+		         , mobileNo = #{mobileNo}
+		         , joinDate = #{joinDate}
+		 WHERE seqNo = #{seqNo}	
+	</update>
+	
+	<insert id="insertCertiField" parameterType="MemberCertiField">
+		<selectKey keyProperty="seqNo" resultType="int" order="BEFORE"> 
+			SELECT IFNULL(MAX(seqNo),0)+1 AS next_id FROM member_certi_field 
+	 	</selectKey> 
+	 	
+		INSERT 
+		   INTO member_certi_field 
+		   (
+          	  seqNo
+			, residNo
+         	, issuedPlaceCd
+   		 	, certiCd
+   			, fieldNm
+   			, fieldKorNm
+   			, fieldCnt
+           ) VALUES (
+			  #{seqNo}
+			, #{residNo}
+			, #{issuedPlaceCd}
+			, #{certiCd}
+			, #{fieldNm}
+			, #{fieldKorNm}
+			, #{fieldCnt}
+		   )
+	</insert>
+	
+	<delete id="deleteMemberCertiField" parameterType="memberCertiField">
+		DELETE 
+		  FROM member_certi_field
+		WHERE residNo = #{residNo}
+		    AND issuedPlaceCd = #{issuedPlaceCd}
+		    AND certiCd = #{certiCd}
+	</delete>
+	
+	<insert id="insertAban" parameterType="Member">
+		INSERT 
+		   INTO certi_aban 
+	   		(
+	   			mbNm
+				, certiCd
+				, abanDate 		   			
+	   		) 
+		SELECT  (SELECT mbNm
+		                FROM member
+		               WHERE residNo = A.residNo
+		           ) AS mbNm 
+		          , A.certiCd
+		          , NOW()	   
+		   FROM member_certi_field AS A
+		  WHERE residNo = (SELECT residNo FROM member WHERE seqNo = #{seqNo})
+		  GROUP BY issuedPlaceCd
+		                , certiCd		
+	</insert>
+	
+	<delete id="deleteAbanMember" parameterType="Member">
+		DELETE
+		  FROM member
+		WHERE seqNo = #{seqNo}
+	</delete>
+	
+	<delete id="deleteAbanMemberCertiField" parameterType="Member">
+		DELETE
+		  FROM member_certi_field		      
+		WHERE residNo = (SELECT residNo FROM member WHERE seqNo = #{seqNo})
+	</delete>
+</mapper>

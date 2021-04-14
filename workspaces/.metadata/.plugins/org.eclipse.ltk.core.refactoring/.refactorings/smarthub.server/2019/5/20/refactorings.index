@@ -1,0 +1,28 @@
+1557727878132	Copy compilation unit
+1557727981605	Copy compilation units
+1557730313220	Delete element
+1557798420236	Rename type 'VerifiableCredentialServer'
+1557798530642	Rename compilation unit 'VerifiableCredentialServerImpl.java'
+1557798737356	Rename resource 'VerifiableCredential.proto'
+1557798771383	Delete elements
+1557798776688	Delete element
+1557798832316	Delete elements
+1557798841303	Delete element
+1557798881707	Delete element
+1557799077171	Rename type 'VerifiableCredentialServer'
+1557799787635	Rename resource 'SmartHub.proto'
+1557799855001	Delete elements
+1557799861351	Delete elements
+1557799889740	Delete elements
+1557800105150	Rename type 'VerifiableCredentialServer'
+1557800118398	Rename type 'VerifiableCredentialServerImpl'
+1557800195426	Rename resource 'VerifiableCredential.proto'
+1557800333761	Rename package 'com.wooribank.blockchain.verifiablecredential'
+1557800359629	Rename package 'com.wooribank.blockchain.verifiablecredential'
+1557800735572	Delete element
+1557805536191	Rename package 'com.wooribank.blockchain.verifiablecredential'
+1557806252403	Rename type 'SmartHubServer'
+1557989906689	Rename resource 'Chat.proto'
+1557990610576	Rename compilation unit 'ChatServiceImpl.java'
+1557990628176	Rename type 'ChatServer'
+1557990822731	Rename type 'ChatClient'

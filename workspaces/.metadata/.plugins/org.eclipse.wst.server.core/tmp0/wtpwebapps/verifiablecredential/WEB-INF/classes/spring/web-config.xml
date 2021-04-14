@@ -1,0 +1,96 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" 
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd
+        				   http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/tx
+        				   http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/util 
+        				   http://www.springframework.org/schema/util/spring-util.xsd        				   
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd ">
+
+    <mvc:annotation-driven />
+    <context:component-scan base-package="com.wooribank.blockchain.verifiablecredential" />
+ 	
+	<util:properties id="app_prop" location="classpath:/properties/application-${spring.profiles.active}.properties"/>
+    
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="url" value="#{app_prop['dataSource.url']}" />
+		<property name="driverClassName" value="#{app_prop['dataSource.driverClassName']}" />
+		<property name="username" value="#{app_prop['dataSource.username']}" />
+		<property name="password" value="#{app_prop['dataSource.password']}" />
+		<property name="initialSize" value="#{app_prop['dataSource.initialSize']}" />
+		<property name="maxTotal" value="#{app_prop['dataSource.maxTotal']}"/>
+		<property name="minIdle" value="#{app_prop['dataSource.minIdle']}"/>
+		<property name="maxWaitMillis" value="#{app_prop['dataSource.maxWaitMillis']}"/>
+		<property name="poolPreparedStatements" value="#{app_prop['dataSource.poolPreparedStatements']}"/>
+		<property name="maxOpenPreparedStatements" value="#{app_prop['dataSource.maxOpenPreparedStatements']}"/>
+		<property name="validationQuery" value="#{app_prop['dataSource.validationQuery']}"/>
+		<property name="testWhileIdle" value="#{app_prop['dataSource.testWhileIdle']}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="#{app_prop['dataSource.timeBetweenEvictionRunsMillis']}"/>
+	</bean>
+	
+	<mybatis:scan base-package="com.wooribank.blockchain.verifiablecredential.dao" />
+
+	<bean id="sqlSessionFactory" name="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" lazy-init="true">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations" value="classpath:com/wooribank/blockchain/verifiablecredential/mapper/*.xml" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+	</bean>
+	
+	<!-- transactionManager -->	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="*insert*" rollback-for="Exception"/>
+			<tx:method name="*Insert*" rollback-for="Exception"/>
+			<tx:method name="*update*" rollback-for="Exception"/>
+			<tx:method name="*Update*" rollback-for="Exception"/>
+			<tx:method name="*delete*" rollback-for="Exception"/>
+			<tx:method name="*Delete*" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="serviceOperations" expression="execution(* com.wooribank.blockchain.verifiablecredential..*service..*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperations"/>
+	</aop:config>
+		
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>  
+	
+	<!--  
+	<mvc:resources mapping="/resources/css/**" 	location="/resources/css/" />
+    <mvc:resources mapping="/resources/js/**" 	location="/resources/js/" />
+    <mvc:resources mapping="/resources/images/**" 	location="/resources/images/" />
+    <mvc:resources mapping="/resources/bootstrap/css/**" 	location="/resources/bootstrap/css/" />
+    <mvc:resources mapping="/resources/bootstrap/js/**" 	location="/resources/bootstrap/js/" />
+    -->
+    
+	<!-- BeanNameViewResolver for downloadview -->
+	<bean id="customJsonView" class="com.wooribank.blockchain.verifiablecredential.view.CustomJsonView" />
+    <bean id="beanNameViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" >
+		<property name="order" value="1" />
+	</bean>
+	
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+     
+</beans>

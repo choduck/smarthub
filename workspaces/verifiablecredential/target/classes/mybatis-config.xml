@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org/DTD Config 3.0/EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+		<setting name="useGeneratedKeys" value="true" />
+		<setting name="defaultExecutorType" value="REUSE" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias alias="CommonCode" type="com.wooribank.blockchain.verifiablecredential.model.CommonCode" />
+		<typeAlias alias="CertiList" type="com.wooribank.blockchain.verifiablecredential.model.CertiList" />
+		<typeAlias alias="CertiField" type="com.wooribank.blockchain.verifiablecredential.model.CertiField" />
+		<typeAlias alias="Field" type="com.wooribank.blockchain.verifiablecredential.model.Field" />
+		<typeAlias alias="Member" type="com.wooribank.blockchain.verifiablecredential.model.Member"/>
+		<typeAlias alias="MemberCertiField" type="com.wooribank.blockchain.verifiablecredential.model.MemberCertiField"/>
+		<typeAlias alias="Aban" type="com.wooribank.blockchain.verifiablecredential.model.Aban"/>
+	</typeAliases>
+</configuration>

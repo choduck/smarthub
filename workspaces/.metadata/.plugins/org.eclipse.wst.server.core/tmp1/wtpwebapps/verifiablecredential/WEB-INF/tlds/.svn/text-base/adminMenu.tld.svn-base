@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+    version="2.0">
+	
+	<description>관리자  메뉴코드 및  URL text 제공</description>
+	<display-name>adminMenu</display-name>
+	<jsp-version>2.0</jsp-version>
+	<tlib-version>1.2</tlib-version>
+	<short-name>adminMenu</short-name>
+	
+	<tag>
+		<name>adminMenu</name>
+		<tag-class>com.apmall.adm.customtag.AdminMenuCustomTag</tag-class>
+		<body-content>empty</body-content>
+		
+		<attribute>
+			<name>adminMenuL</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>adminMenuS</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>curMenuId</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>curMenuCd</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>menuType</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+	</tag>
+</taglib>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wooribank.blockchain.verifiablecredential.dao.CertiFieldDao">
+	
+	<select id="pageListCount"  parameterType="CertiField" resultType="int">
+		SELECT COUNT(A.cnt)
+		  FROM (SELECT COUNT(*) AS cnt
+					  FROM certi_list
+       	             GROUP BY issuedPlaceCd	
+			      ) AS A
+	</select>
+	
+	<select id="pageList" parameterType="CertiList"  resultType="CertiList">
+		SELECT A.seqNo	
+		         , A.issuedPlaceCD
+		         , (SELECT cdNm 
+		              FROM  code
+		             WHERE uppCd = 'A0001'
+		                 AND cd = A.issuedPlaceCD
+		            ) AS issuedPlaceNm
+		         , A.certiCd
+		         , (SELECT cdNm 
+		               FROM code
+		             WHERE uppCd = 'B0001'
+		                 AND cd = A.certiCd
+		            ) AS certiNm
+		           , @rownum:=@rownum+1 AS rowNum        
+		   FROM	certi_list AS A	
+		          , (SELECT @rownum:=0) TMP
+		GROUP BY issuedPlaceCd, certiCd
+		ORDER BY seqNo DESC		
+		  LIMIT #{beginArticleNum}, #{endArticleNum}
+	</select>
+	
+	<insert id="insertCertiList" parameterType="CertiField">
+		<selectKey keyProperty="seqNo" resultType="int" order="BEFORE"> 
+			SELECT IFNULL(MAX(seqNo),0)+1 AS NEXT_ID FROM certi_list
+	 	</selectKey> 
+	 	
+	 	INSERT 
+	 	   INTO certi_list
+			(
+			      seqNo
+				, issuedPlaceCd
+				, certiCd
+			)	VALUES (
+			      #{seqNo}
+				, #{issuedPlaceCd}
+				, #{certiCd}
+			)
+	</insert>
+	
+	<insert id="insertCertiField" parameterType="Field">
+		<selectKey keyProperty="seqNo" resultType="int" order="BEFORE"> 
+			SELECT IFNULL(MAX(seqNo),0)+1 AS NEXT_ID FROM certi_field 
+	 	</selectKey> 
+	 	
+	 	INSERT 
+	 	   INTO certi_field 
+			(
+			      seqNo
+				, certiCd
+				, orderNo
+				, fieldNm
+				, fieldKorNm
+				, dataTp
+				, desctn
+			)	VALUES (
+			      #{seqNo}
+				, #{certiCd}
+				, #{orderNo}
+				, #{fieldNm}
+				, #{fieldKorNm}
+				, #{dataTp}
+				, #{desctn}
+			)
+	</insert>
+	
+	<select id="selectCertiList" parameterType="CertiList"  resultType="CertiField">
+		SELECT A.seqNo	
+		         , A.issuedPlaceCD
+		         , (SELECT cdNm 
+		               FROM code
+		             WHERE uppCd = 'A0001'
+		                 AND cd = A.issuedPlaceCD
+		            ) AS issuedPlaceNm
+		         , A.certiCd
+		         , (SELECT cdNm 
+		               FROM code
+		             WHERE uppCd = 'B0001'
+		                 AND cd = A.certiCd
+		            ) AS certiNm   
+		   FROM certi_list AS A	
+		 WHERE 1=1
+		<if test='seqNo != null and seqNo != "" '>
+			AND A.seqNo = #{seqNo}
+		</if>
+	</select>
+	
+	<select id="selectCertiField" parameterType="CertiList" resultType="Field">
+		SELECT seqNo
+		         , certiCd
+				 , orderNo
+				 , fieldNm
+				 , fieldKorNm
+				 , dataTp
+				 , desctn
+		  FROM certi_field
+		WHERE 1=1
+		<if test='certiCd != null and certiCd != "" '>
+			AND certiCd = #{certiCd}
+		</if>
+	</select>
+	
+	<select id="fieldTotalCount" parameterType="CertiList" resultType="int">
+		SELECT COUNT(*)
+		   FROM certi_field
+		WHERE 1=1
+		<if test='certiCd != null and certiCd != "" '>
+			AND certiCd = #{certiCd}
+		</if>
+	</select>
+	
+	<update id="updateCertiList" parameterType="CertiField">
+		UPDATE certi_list 
+		     SET issuedPlaceCd = #{issuedPlaceCd}
+			     , certiCd = #{certiCd}
+		WHERE seqNo = #{seqNo}
+	</update>
+	
+	<delete id="deleteCertiField" parameterType="CertiField">
+		DELETE 
+		  FROM certi_field
+		WHERE certiCd = #{certiCd}
+	</delete>
+	
+	<delete id="deleteCertiListField" parameterType="CertiList">
+		DELETE CL, CF
+		  FROM certi_list AS CL
+		   LEFT OUTER JOIN certi_field AS CF
+		      ON CL.certiCd = CF.certiCd
+		WHERE CL.seqNo = #{seqNo}
+	</delete>
+
+</mapper>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+	<property name="LOG_LEVEL" value="DEBUG" /><!-- INFO, DEBUG, WARM, ERROR -->
+	<property name="SPRING_LOG_LEVEL" value="DEBUG" /><!-- INFO, DEBUG, WARM, ERROR -->
+	<property name="SQL_LOG_LEVEL" value="DEBUG" /><!-- INFO, DEBUG, WARM, ERROR -->
+
+ 	<property name="LOG_PATH" value="/var/lib/tomcat8/logs" />
+</included>
+

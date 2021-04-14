@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wooribank.blockchain.verifiablecredential.dao.CommonCodeDao">
+		
+	<select id="codeList"  parameterType="CommonCode"  resultType="CommonCode">
+		SELECT	cd
+		        , 	cdNm
+        FROM		code
+       	WHERE	uppCd = #{uppCd}
+       	<if test='cd != null and cd != "" '>
+			AND cd = #{cd}
+		</if>
+       	AND		useFl = 'Y'
+       ORDER BY orderNo ASC
+	</select>
+	
+</mapper>
+
+
+

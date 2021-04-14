@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+	<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+	
+	<include resource="logback-${spring.profiles.active}.xml"/>
+  
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="ACCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}\\log.verifiablecredential.root.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}\\verifiablecredentail\\log.verifiablecredential.root.%d{yyyy-MM-dd-HH}_%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		      <!-- or whenever the file size reaches 100MB -->
+		      <maxFileSize>100MB</maxFileSize>
+		    </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+		<encoder>
+			<pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+		</encoder>
+		<!-- The log level -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+	
+	<appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}\\log.verifiablecredential.error.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}\\verifiablecredentail\\log.verifiablecredential.error.%d{yyyy-MM-dd-HH}_%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		      <!-- or whenever the file size reaches 100MB -->
+		      <maxFileSize>10MB</maxFileSize>
+		    </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+		<encoder>
+			<pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+		</encoder>
+		<!-- The log level -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>	
+
+    <!-- 	RULES for logging DEBUG < INFO < WARN < ERROR < FATAL --> 
+  
+	<!--  
+	jdbc.sqlonly    : Logs only SQL
+	jdbc.sqltiming  : Logs the SQL, post-execution, including timing execution statistics
+	jdbc.audit      : Logs ALL JDBC calls except for ResultSets
+	jdbc.resultset  : all calls to ResultSet objects are logged
+	jdbc.connection : Logs connection open and close events
+	-->
+
+	
+	<appender name="SQL.TIMING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_PATH}\\log.sql.sqltiming.log</file>
+       	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}\\verifiablecredentail\\sqltiming.%d{yyyy-MM-dd-HH}_%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		      <!-- or whenever the file size reaches 100MB -->
+		      <maxFileSize>100MB</maxFileSize>
+		    </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+	      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+	    </encoder>
+	</appender>
+	
+	<appender name="SQL.RESULTSETTABLE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}\\log.sql.resultsettable.log</file>
+       	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}\\verifiablecredentail\\resultsettable.%d{yyyy-MM-dd-HH}_%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		      <!-- or whenever the file size reaches 100MB -->
+		      <maxFileSize>10MB</maxFileSize>
+		    </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+         <encoder>
+	      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+	    </encoder>
+	</appender>	
+	
+   <!-- log SQL (pre-execution) plus exceptions caused by SQL -->
+	
+ 	<logger name="jdbc.sqlonly" level="OFF"></logger>
+ 	<logger name="jdbc.audit" level="OFF"></logger>
+ 	<logger name="jdbc.resultset" level="OFF"></logger>
+ 	<logger name="jdbc.connection" level="OFF"></logger>
+ 	
+ 	<!--  spring -->
+ 	<logger name="org.springframework" level="${SPRING_LOG_LEVEL}" />
+ 	<logger name="org.springframework.web" level="${SPRING_LOG_LEVEL}"/>
+ 	<logger name="org.springframework.beans" level="${SPRING_LOG_LEVEL}" /> 	 
+	<logger name="org.springframework.web.bind.annotation.support.HandlerMethodInvoker" level="${SPRING_LOG_LEVEL}" />
+	<logger name="org.springframework.web.servlet.DispatcherServlet" level="${SPRING_LOG_LEVEL}" />
+    <logger name="org.springframework.beans.factory.config.PropertiesFactoryBean" level="ERROR"/>
+    <logger name="org.springframework.beans.TypeConverterDelegate" level="ERROR"/>
+	
+	 
+	<logger name="jdbc.sqltiming" level="${SQL_LOG_LEVEL}">
+ 		<appender-ref ref="SQL.TIMING" />
+ 	</logger>
+	<logger name="jdbc.resultsettable" level="${SQL_LOG_LEVEL}">
+ 		<appender-ref ref="SQL.RESULTSETTABLE" />
+ 	</logger>
+	<!-- local or dev  -->
+ 	<root level="${LOG_LEVEL}">
+ 		<appender-ref ref="ACCESS" />
+ 		<appender-ref ref="ERROR_FILE" />
+ 		<appender-ref ref="console"/>
+	</root>
+	
+</configuration>
